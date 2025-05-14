@@ -69,6 +69,8 @@ disease_dataset_df=load_data()
 le=load_label_encoder()
 model=load_SentenceTransformer()
 symp_list_embedding = torch.from_numpy(load_symptom_embeddings())
+if 'gender' not in st.session_state:
+    st.session_state.gender = None
 def tokenizer(inp):
   inp=inp.lower()
   raw_tokens=inp.split(" ")
@@ -80,12 +82,15 @@ def tokenizer(inp):
       if j.isalnum():
         w+=j
     cleaned_tokens.append(w)
-  if "male" not in cleaned_tokens and "female" not in cleaned_tokens:
-    gender= st.selectbox("Select your gender:", ["male", "female"])
-  elif("male" in cleaned_tokens):
-    gender="male"
-  elif("female" in cleaned_tokens):
-    gender="female"
+  if st.session_state.gender is None:
+      if "male" in cleaned_tokens:
+          st.session_state.gender = "male"
+      elif "female" in cleaned_tokens:
+          st.session_state.gender = "female"
+      else:
+          st.session_state.gender = st.selectbox("Select your gender:", ["male", "female"])
+
+  gender = st.session_state.gender
   user_symp_tokens=[]
   for i in range(1,8):
     if(i==7):
