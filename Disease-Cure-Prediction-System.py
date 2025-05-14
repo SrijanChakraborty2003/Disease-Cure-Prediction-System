@@ -148,7 +148,7 @@ if inp:
     with chat_container:
         with st.chat_message("user"):
             st.markdown(inp)
-    user_symptoms=tokenizer(inp)
+user_symptoms=tokenizer(inp)
 for i in user_symptoms:
   if i=="Gender_male":
     us_df[i]=1.0
