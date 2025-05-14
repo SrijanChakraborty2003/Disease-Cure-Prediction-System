@@ -162,3 +162,6 @@ if inp:
     cure = disease_dataset_df.loc[disease_dataset_df['Disease'] == predicted_disease, 'Cure'].values[0]
     with st.chat_message("assistant"):
       st.markdown(f"Disease: {predicted_disease}  \nCure: {cure}")
+for var in ["user_symptoms", "gender", "inp", "us_df", "predicted_disease","test","user_symp_tokens_embeddings","token","user_symp_tokens","raw_tokens","w"]:
+    if var in st.session_state:
+        del st.session_state[var]
