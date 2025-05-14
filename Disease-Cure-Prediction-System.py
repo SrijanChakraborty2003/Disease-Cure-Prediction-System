@@ -24,7 +24,6 @@ def load_label_encoder():
   return joblib.load('label_encoder.pkl')
 @st.cache_data
 def load_symptom_embeddings():
-  df = pd.read_csv("Symptom List.csv")
   symptoms = ['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
            'abdominal pain', 'abnormal bleeding', 'pelvic pain', 'pain during intercourse',
            'vaginal discharge', 'barking cough', 'runny nose', 'fever', 'stridor', 'rash', 'joint pain',
