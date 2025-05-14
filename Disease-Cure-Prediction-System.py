@@ -22,7 +22,7 @@ def load_SentenceTransformer():
 @st.cache_resource
 def load_label_encoder():
   return joblib.load('label_encoder.pkl')
-  @st.cache_data
+@st.cache_data
 def load_symptom_embeddings():
   df = pd.read_csv("Symptom List.csv")
   symptoms = ['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
