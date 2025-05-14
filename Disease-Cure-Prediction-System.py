@@ -145,10 +145,10 @@ def tokenizer(inp):
 chat_container = st.container()
 inp=st.chat_input("Enter your symptoms...")
 if inp:
+    user_symptoms=tokenizer(inp)
     with chat_container:
         with st.chat_message("user"):
             st.markdown(inp)
-    user_symptoms=tokenizer(inp)
 for i in user_symptoms:
   if i=="Gender_male":
     us_df[i]=1.0
