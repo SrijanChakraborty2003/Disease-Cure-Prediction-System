@@ -134,7 +134,7 @@ def tokenizer(inp):
   for i in (user_symp_tokens_embeddings):
     cos_score=util.cos_sim(i,symp_list_embedding)
     b=cos_score.argmax()
-    mapped_symptom=symp_list[b]
+    mapped_symptom=symptoms[b]
     score=cos_score[0][b].item()
     if score>0.70:
       if mapped_symptom not in user_symptoms:
