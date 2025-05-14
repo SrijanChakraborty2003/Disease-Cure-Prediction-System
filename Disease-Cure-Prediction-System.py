@@ -149,13 +149,14 @@ if inp:
     with chat_container:
         with st.chat_message("user"):
             st.markdown(inp)
-for i in user_symptoms:
-  if i=="Gender_male":
-    us_df[i]=1.0
-  elif i=="Gender_female":
-    us_df[i]=1.0
-  else:
-    us_df[i]=1
+if user_symptoms:
+    for i in user_symptoms:
+        if i=="Gender_male":
+            us_df[i]=1.0
+        elif i=="Gender_female":
+            us_df[i]=1.0
+        else:
+            us_df[i]=1
 test=xgb_model.predict(us_df)
 predicted_disease=le.inverse_transform(test)[0]
 cure = disease_dataset_df.loc[disease_dataset_df['Disease'] == predicted_disease, 'Cure'].values[0]
