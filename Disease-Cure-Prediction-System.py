@@ -22,9 +22,10 @@ def load_SentenceTransformer():
 @st.cache_resource
 def load_label_encoder():
   return joblib.load('label_encoder.pkl')
-@st.cache_resource
-def load_symptom_embeddings(model):
-  symp_list=['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
+  @st.cache_data
+def load_symptom_embeddings():
+    df = pd.read_csv("Symptom List.csv")
+    symptoms = ['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
            'abdominal pain', 'abnormal bleeding', 'pelvic pain', 'pain during intercourse',
            'vaginal discharge', 'barking cough', 'runny nose', 'fever', 'stridor', 'rash', 'joint pain',
            'severe headache', 'high fever', 'loss of awareness', 'confusion', 'uncontrollable jerking movements',
@@ -60,14 +61,14 @@ def load_symptom_embeddings(model):
            'blood in urine', 'gas', 'diarrhea or constipation', 'light sensitivity', 'aura', 'trouble speaking', 'loss of balance', 'sudden numbness', 'vision problems',
            'tingling', 'pale skin', 'frequent urge', 'cloudy urine', 'burning urination', 'excess hair', 'acne', 'pain during bowel movements', 'rectal bleeding'
            ]
-  symp_list_embedding=model.encode(symp_list, convert_to_tensor=True)
-  return symp_list_embedding.cpu().numpy()
+    embeddings = model.encode(symptoms)
+    return np.array(embeddings)
 xgb_model=load_model()
 us_df=load_table()
 disease_dataset_df=load_data()
 le=load_label_encoder()
 model=load_SentenceTransformer()
-symp_list_embedding=torch.from_numpy(load_symptom_embeddings(model))
+symp_list_embedding = torch.from_numpy(load_symptom_embeddings())
 def tokenizer(inp):
   inp=inp.lower()
   raw_tokens=inp.split(" ")
