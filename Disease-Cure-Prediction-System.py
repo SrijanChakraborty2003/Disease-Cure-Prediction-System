@@ -23,9 +23,7 @@ def load_SentenceTransformer():
 @st.cache_resource
 def load_label_encoder():
   return joblib.load('label_encoder.pkl')
-@st.cache_data
-def load_symptom_embeddings():
-  symptoms = ['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
+symptoms = ['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
            'abdominal pain', 'abnormal bleeding', 'pelvic pain', 'pain during intercourse',
            'vaginal discharge', 'barking cough', 'runny nose', 'fever', 'stridor', 'rash', 'joint pain',
            'severe headache', 'high fever', 'loss of awareness', 'confusion', 'uncontrollable jerking movements',
@@ -61,6 +59,8 @@ def load_symptom_embeddings():
            'blood in urine', 'gas', 'diarrhea or constipation', 'light sensitivity', 'aura', 'trouble speaking', 'loss of balance', 'sudden numbness', 'vision problems',
            'tingling', 'pale skin', 'frequent urge', 'cloudy urine', 'burning urination', 'excess hair', 'acne', 'pain during bowel movements', 'rectal bleeding'
            ]
+@st.cache_data
+def load_symptom_embeddings():
   embeddings = model.encode(symptoms)
   return np.array(embeddings)
 xgb_model=load_model()
