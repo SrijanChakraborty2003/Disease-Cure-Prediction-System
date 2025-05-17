@@ -141,6 +141,7 @@ def tokenizer(inp):
   return user_symptoms
 chat_container = st.container()
 inp=st.chat_input("Enter your symptoms...")
+user_symptoms=[]
 if inp:
     with chat_container:
         with st.chat_message("user"):
