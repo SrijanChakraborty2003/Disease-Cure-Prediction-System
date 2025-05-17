@@ -79,8 +79,6 @@ def tokenizer(inp):
       if j.isalnum():
         w+=j
     cleaned_tokens.append(w)
-  if "male" not in cleaned_tokens and "female" not in cleaned_tokens:
-    gender= st.selectbox("Select your gender:", ["male", "female"])
   elif("male" in cleaned_tokens):
     gender="male"
   elif("female" in cleaned_tokens):
