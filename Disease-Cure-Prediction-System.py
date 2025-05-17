@@ -79,10 +79,10 @@ def tokenizer(inp):
       if j.isalnum():
         w+=j
     cleaned_tokens.append(w)
-  elif("male" in cleaned_tokens):
-    gender="male"
+  if("male" in cleaned_tokens):
+      gender="male"
   elif("female" in cleaned_tokens):
-    gender="female"
+      gender="female"
   user_symp_tokens=[]
   for i in range(1,8):
     if(i==7):
