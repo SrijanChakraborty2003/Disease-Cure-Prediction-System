@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import pickle
 from sentence_transformers import SentenceTransformer, util
 import joblib
@@ -9,7 +8,7 @@ st.title("Disease & Cure Prediction System")
 
 @st.cache_resource
 def load_model():
-  with open("xgb_model.pkl",'rb') as f:
+  with open("xgb_model.pkl",rb) as f:
      return pickle.load(f)
 @st.cache_data
 def load_table():
@@ -19,13 +18,13 @@ def load_data():
   return pd.read_csv("Disease_Data-set.csv")
 @st.cache_resource
 def load_SentenceTransformer():
-  return SentenceTransformer('all-MiniLM-L6-v2')
+    return SentenceTransformer('all-MiniLM-L6-v2')
 @st.cache_resource
 def load_label_encoder():
   return joblib.load('label_encoder.pkl')
-@st.cache_data
-def load_symptom_embeddings():
-  symptoms = ['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
+@st.cache_resource
+def load_symptom_embeddings(model):
+  symp_list=['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
            'abdominal pain', 'abnormal bleeding', 'pelvic pain', 'pain during intercourse',
            'vaginal discharge', 'barking cough', 'runny nose', 'fever', 'stridor', 'rash', 'joint pain',
            'severe headache', 'high fever', 'loss of awareness', 'confusion', 'uncontrollable jerking movements',
@@ -61,18 +60,15 @@ def load_symptom_embeddings():
            'blood in urine', 'gas', 'diarrhea or constipation', 'light sensitivity', 'aura', 'trouble speaking', 'loss of balance', 'sudden numbness', 'vision problems',
            'tingling', 'pale skin', 'frequent urge', 'cloudy urine', 'burning urination', 'excess hair', 'acne', 'pain during bowel movements', 'rectal bleeding'
            ]
-  embeddings = model.encode(symptoms)
-  return np.array(embeddings)
+  symp_list_embedding=model.encode(symp_list, convert_to_tensor=True)
+  return symp_list_embedding.cpu().numpy()
 xgb_model=load_model()
 us_df=load_table()
 disease_dataset_df=load_data()
 le=load_label_encoder()
 model=load_SentenceTransformer()
-symp_list_embedding = torch.from_numpy(load_symptom_embeddings())
-if 'gender' not in st.session_state or st.session_state.gender is None:
-    st.session_state.gender = st.selectbox("Select your gender:", ["male", "female"])
-    st.stop()
-def tokenizer(inp,gender):
+symp_list_embedding=torch.from_numpy(load_symptom_embeddings(model))
+def tokenizer(inp):
   inp=inp.lower()
   raw_tokens=inp.split(" ")
   gender=""
@@ -83,12 +79,12 @@ def tokenizer(inp,gender):
       if j.isalnum():
         w+=j
     cleaned_tokens.append(w)
-#   if "male" not in cleaned_tokens and "female" not in cleaned_tokens:
-#     gender= st.selectbox("Select your gender:", ["male", "female"])
-#   elif("male" in cleaned_tokens):
-#     gender="male"
-#   elif("female" in cleaned_tokens):
-#     gender="female"
+  if "male" not in cleaned_tokens and "female" not in cleaned_tokens:
+    gender= st.selectbox("Select your gender:", ["male", "female"])
+  elif("male" in cleaned_tokens):
+    gender="male"
+  elif("female" in cleaned_tokens):
+    gender="female"
   user_symp_tokens=[]
   for i in range(1,8):
     if(i==7):
@@ -151,16 +147,16 @@ if inp:
     with chat_container:
         with st.chat_message("user"):
             st.markdown(inp)
-    user_symptoms=tokenizer(inp,st.session_state.gender)
-    for i in user_symptoms:
-      if i=="Gender_male":
-        us_df[i]=1.0
-      elif i=="Gender_female":
-        us_df[i]=1.0
-      else:
-        us_df[i]=1
-    test=xgb_model.predict(us_df)
-    predicted_disease=le.inverse_transform(test)[0]
-    cure = disease_dataset_df.loc[disease_dataset_df['Disease'] == predicted_disease, 'Cure'].values[0]
-    with st.chat_message("assistant"):
-      st.markdown(f"Disease: {predicted_disease}  \nCure: {cure}")
+    user_symptoms=tokenizer(inp)
+for i in user_symptoms:
+  if i=="Gender_male":
+    us_df[i]=1.0
+  elif i=="Gender_female":
+    us_df[i]=1.0
+  else:
+    us_df[i]=1
+test=xgb_model.predict(us_df)
+predicted_disease=le.inverse_transform(test)[0]
+cure = disease_dataset_df.loc[disease_dataset_df['Disease'] == predicted_disease, 'Cure'].values[0]
+with st.chat_message("assistant"):
+  st.markdown(f"Disease: {predicted_disease}  \nCure: {cure}")
