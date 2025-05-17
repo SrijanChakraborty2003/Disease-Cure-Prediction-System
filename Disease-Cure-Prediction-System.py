@@ -8,7 +8,7 @@ st.title("Disease & Cure Prediction System")
 
 @st.cache_resource
 def load_model():
-  with open("xgb_model.pkl",rb) as f:
+  with open("xgb_model.pkl",'rb') as f:
      return pickle.load(f)
 @st.cache_data
 def load_table():
