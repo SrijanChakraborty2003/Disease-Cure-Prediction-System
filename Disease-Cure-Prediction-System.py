@@ -22,9 +22,7 @@ def load_SentenceTransformer():
 @st.cache_resource
 def load_label_encoder():
   return joblib.load('label_encoder.pkl')
-@st.cache_resource
-def load_symptom_embeddings(_model):
-  symp_list=['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
+symp_list=['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
            'abdominal pain', 'abnormal bleeding', 'pelvic pain', 'pain during intercourse',
            'vaginal discharge', 'barking cough', 'runny nose', 'fever', 'stridor', 'rash', 'joint pain',
            'severe headache', 'high fever', 'loss of awareness', 'confusion', 'uncontrollable jerking movements',
@@ -58,8 +56,9 @@ def load_symptom_embeddings(_model):
            'difficulty speaking', 'slow movement', 'loss of taste or smell', 'muscle aches', 'sweating', 'red patches on skin', 'scaly skin', 'dry cracked skin',
            'red patches', 'inflammation', 'whiteheads', 'cough with phlegm', 'chest discomfort', 'mucus production', 'upper abdominal pain', 'severe flank pain',
            'blood in urine', 'gas', 'diarrhea or constipation', 'light sensitivity', 'aura', 'trouble speaking', 'loss of balance', 'sudden numbness', 'vision problems',
-           'tingling', 'pale skin', 'frequent urge', 'cloudy urine', 'burning urination', 'excess hair', 'acne', 'pain during bowel movements', 'rectal bleeding'
-           ]
+           'tingling', 'pale skin', 'frequent urge', 'cloudy urine', 'burning urination', 'excess hair', 'acne', 'pain during bowel movements', 'rectal bleeding']
+@st.cache_resource
+def load_symptom_embeddings(_model):
   symp_list_embedding=model.encode(symp_list, convert_to_tensor=True)
   return symp_list_embedding.cpu().numpy()
 xgb_model=load_model()
