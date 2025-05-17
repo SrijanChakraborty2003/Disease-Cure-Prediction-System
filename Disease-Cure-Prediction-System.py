@@ -23,7 +23,9 @@ def load_SentenceTransformer():
 @st.cache_resource
 def load_label_encoder():
   return joblib.load('label_encoder.pkl')
-symptoms = ['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
+@st.cache_data
+def load_symptom_embeddings():
+  symptoms = ['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
            'abdominal pain', 'abnormal bleeding', 'pelvic pain', 'pain during intercourse',
            'vaginal discharge', 'barking cough', 'runny nose', 'fever', 'stridor', 'rash', 'joint pain',
            'severe headache', 'high fever', 'loss of awareness', 'confusion', 'uncontrollable jerking movements',
@@ -59,8 +61,6 @@ symptoms = ['pain during urination', 'abnormal discharge', 'intermenstrual bleed
            'blood in urine', 'gas', 'diarrhea or constipation', 'light sensitivity', 'aura', 'trouble speaking', 'loss of balance', 'sudden numbness', 'vision problems',
            'tingling', 'pale skin', 'frequent urge', 'cloudy urine', 'burning urination', 'excess hair', 'acne', 'pain during bowel movements', 'rectal bleeding'
            ]
-@st.cache_data
-def load_symptom_embeddings():
   embeddings = model.encode(symptoms)
   return np.array(embeddings)
 xgb_model=load_model()
@@ -69,22 +69,26 @@ disease_dataset_df=load_data()
 le=load_label_encoder()
 model=load_SentenceTransformer()
 symp_list_embedding = torch.from_numpy(load_symptom_embeddings())
-if 'gender' not in st.session_state:
-    st.session_state.gender = None
+if 'gender' not in st.session_state or st.session_state.gender is None:
+    st.session_state.gender = st.selectbox("Select your gender:", ["male", "female"])
+    st.stop()
 def tokenizer(inp):
-  inp = inp.lower()
-  raw_tokens = inp.split(" ")
-  cleaned_tokens = []
+  inp=inp.lower()
+  raw_tokens=inp.split(" ")
+  gender=""
+  cleaned_tokens=[]
   for i in raw_tokens:
-      w = "".join([j for j in i if j.isalnum()])
-      cleaned_tokens.append(w)
-  if st.session_state.gender is None:
-      if "male" in cleaned_tokens:
-          st.session_state.gender = "male"
-      elif "female" in cleaned_tokens:
-          st.session_state.gender = "female"
-  if st.session_state.gender is None:
-      return None
+    w=""
+    for j in i:
+      if j.isalnum():
+        w+=j
+    cleaned_tokens.append(w)
+#   if "male" not in cleaned_tokens and "female" not in cleaned_tokens:
+#     gender= st.selectbox("Select your gender:", ["male", "female"])
+#   elif("male" in cleaned_tokens):
+#     gender="male"
+#   elif("female" in cleaned_tokens):
+#     gender="female"
   user_symp_tokens=[]
   for i in range(1,8):
     if(i==7):
@@ -133,7 +137,7 @@ def tokenizer(inp):
   for i in (user_symp_tokens_embeddings):
     cos_score=util.cos_sim(i,symp_list_embedding)
     b=cos_score.argmax()
-    mapped_symptom=symptoms[b]
+    mapped_symptom=symp_list[b]
     score=cos_score[0][b].item()
     if score>0.70:
       if mapped_symptom not in user_symptoms:
@@ -142,29 +146,21 @@ def tokenizer(inp):
   user_symptoms.append(gender)
   return user_symptoms
 chat_container = st.container()
-user_symptoms=[]
 inp=st.chat_input("Enter your symptoms...")
 if inp:
+    with chat_container:
+        with st.chat_message("user"):
+            st.markdown(inp)
     user_symptoms=tokenizer(inp)
-    if user_symptoms is None:
-        st.session_state.gender = st.selectbox("Please select your gender:", ["male", "female"])
-        st.warning("Please select your gender to continue.")
-    else:
-        with chat_container:
-            with st.chat_message("user"):
-                st.markdown(inp)
-        for i in user_symptoms:
-            if i=="Gender_male":
-                us_df[i]=1.0
-            elif i=="Gender_female":
-                us_df[i]=1.0
-            else:
-                us_df[i]=1
-    test=xgb_model.predict(us_df)
-    predicted_disease=le.inverse_transform(test)[0]
-    cure = disease_dataset_df.loc[disease_dataset_df['Disease'] == predicted_disease, 'Cure'].values[0]
-    with st.chat_message("assistant"):
-      st.markdown(f"Disease: {predicted_disease}  \nCure: {cure}")
-for var in ["user_symptoms", "gender", "inp", "us_df", "predicted_disease","test","user_symp_tokens_embeddings","token","user_symp_tokens","raw_tokens","w"]:
-    if var in st.session_state:
-        del st.session_state[var]
+for i in user_symptoms:
+  if i=="Gender_male":
+    us_df[i]=1.0
+  elif i=="Gender_female":
+    us_df[i]=1.0
+  else:
+    us_df[i]=1
+test=xgb_model.predict(us_df)
+predicted_disease=le.inverse_transform(test)[0]
+cure = disease_dataset_df.loc[disease_dataset_df['Disease'] == predicted_disease, 'Cure'].values[0]
+with st.chat_message("assistant"):
+  st.markdown(f"Disease: {predicted_disease}  \nCure: {cure}")
