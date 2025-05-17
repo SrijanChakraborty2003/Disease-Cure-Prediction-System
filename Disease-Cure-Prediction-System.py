@@ -72,7 +72,7 @@ symp_list_embedding = torch.from_numpy(load_symptom_embeddings())
 if 'gender' not in st.session_state or st.session_state.gender is None:
     st.session_state.gender = st.selectbox("Select your gender:", ["male", "female"])
     st.stop()
-def tokenizer(inp):
+def tokenizer(inp,gender):
   inp=inp.lower()
   raw_tokens=inp.split(" ")
   gender=""
@@ -151,7 +151,7 @@ if inp:
     with chat_container:
         with st.chat_message("user"):
             st.markdown(inp)
-    user_symptoms=tokenizer(inp)
+    user_symptoms=tokenizer(inp,st.session_state.gender)
 for i in user_symptoms:
   if i=="Gender_male":
     us_df[i]=1.0
