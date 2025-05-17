@@ -72,21 +72,21 @@ symp_list_embedding = torch.from_numpy(load_symptom_embeddings())
 if 'gender' not in st.session_state:
     st.session_state.gender = None
 def tokenizer(inp):
-    inp = inp.lower()
-    raw_tokens = inp.split(" ")
-    cleaned_tokens = []
-    for i in raw_tokens:
-        w = "".join([j for j in i if j.isalnum()])
-        cleaned_tokens.append(w)
-    if st.session_state.gender is None:
-        if "male" in cleaned_tokens:
-            st.session_state.gender = "male"
-        elif "female" in cleaned_tokens:
-            st.session_state.gender = "female"
-    if st.session_state.gender is None:
-        st.session_state.gender = st.selectbox("Select your gender:", ["male", "female"])
-        st.stop() 
-    gender = st.session_state.gender
+  inp = inp.lower()
+  raw_tokens = inp.split(" ")
+  cleaned_tokens = []
+  for i in raw_tokens:
+      w = "".join([j for j in i if j.isalnum()])
+      cleaned_tokens.append(w)
+  if st.session_state.gender is None:
+      if "male" in cleaned_tokens:
+          st.session_state.gender = "male"
+      elif "female" in cleaned_tokens:
+          st.session_state.gender = "female"
+  if st.session_state.gender is None:
+      st.session_state.gender = st.selectbox("Select your gender:", ["male", "female"])
+      st.stop() 
+  gender = st.session_state.gender
   user_symp_tokens=[]
   for i in range(1,8):
     if(i==7):
