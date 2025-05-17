@@ -84,9 +84,7 @@ def tokenizer(inp):
       elif "female" in cleaned_tokens:
           st.session_state.gender = "female"
   if st.session_state.gender is None:
-      st.session_state.gender = st.selectbox("Select your gender:", ["male", "female"])
-      st.stop() 
-  gender = st.session_state.gender
+      return None
   user_symp_tokens=[]
   for i in range(1,8):
     if(i==7):
