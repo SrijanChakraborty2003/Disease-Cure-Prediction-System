@@ -23,7 +23,7 @@ def load_SentenceTransformer():
 def load_label_encoder():
   return joblib.load('label_encoder.pkl')
 @st.cache_resource
-def load_symptom_embeddings(model):
+def load_symptom_embeddings(_model):
   symp_list=['pain during urination', 'abnormal discharge', 'intermenstrual bleeding',
            'abdominal pain', 'abnormal bleeding', 'pelvic pain', 'pain during intercourse',
            'vaginal discharge', 'barking cough', 'runny nose', 'fever', 'stridor', 'rash', 'joint pain',
